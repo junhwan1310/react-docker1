@@ -1,0 +1,35 @@
+name: Deploy Vite React to EC2
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  ec2deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: EC2서버에 접속하기
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            set -e
+
+            APP_DIR=/home/ubuntu/vite-react-app
+            REPO_URL="https://github.com/junhwan1310/react-docker1.git"
+            DEV_PORT=5173
+
+            if [! -d "$APP_DIR/.git"]; then
+              sudo mkdir -p $APP_DIR
+              sudo chown -R $USER:$USER $APP_DIR
+              git clone $REPO_URL $APP_DIR
+            fi
+
+            cd $APP_DRI
+            git checkout main
+            git pull origin main
+
+            npm ci
